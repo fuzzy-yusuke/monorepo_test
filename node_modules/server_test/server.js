@@ -2,6 +2,8 @@ const express = require('express');
 const redis = require('./lib/redis');
 const usersHandler = require('./handlers/users');
 
+const app = express();
+
 app.get('/user/:id', async(req, res) => {
     try{
         const user = await usersHandler.getUser(req);
@@ -12,12 +14,13 @@ app.get('/user/:id', async(req, res) => {
     }
 });
 
-app.get('/users', async(req, res) => {
-    try{
-        const locals = await usersHandler.getUsers(req);
-        res.render(path.join(__dirname, 'views', 'user.ejs'), locals);
-    } catch (err){
+app.get('/api/users', async(req, res) => {
+    try {
+        const users = await usersHandler.getUsers(req);
+        res.status(200).json(users);
+    } catch (err) {
         console.error(err);
+        res.status(500).send('internal error');
     }
 });
 
@@ -26,7 +29,7 @@ redis.connect()
         try{
             await redis.init();
 
-            app.listen(3000, () => {
+            app.listen(process.env.PORT, () => {
                 console.log('start listening');
             });
         } catch (err) {

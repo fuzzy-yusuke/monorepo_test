@@ -1,25 +1,36 @@
 import { useState } from 'react';
 import './App.css';
 
+function User({ name }) {
+  return <li style={{ padding: '8px'}}>{name}</li>
+}
+
+const getUsers = async() => {
+  const response = await fetch('http://localhost:8000/api/users');
+  const body = response.json();
+  return body;
+}
+
 function App() {
   const [users, setUsers] = useState(['alpha','bravo','charlie','delta']);
   const  [inputText, setInputText] = useState('');
-  //let inputText = '';
+
+  getUsers()
+    .then((data) => console.log(data))
+    .catch((error) => console.error(error));
 
   const userList = users.map((user) => {
-    return <li key={user}>{user}</li>
+    return <User key={user} name={user} />;
   });
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const newUsers = [...users, inputText];
     setUsers(newUsers);
-    //console.log("handle submit:", inputText);
   }
 
   const handleChange = (event) => {
     setInputText(event.target.value);
-    //console.log('handle change:', event.target.value);
   }
 
   return (
